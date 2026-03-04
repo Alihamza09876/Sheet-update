@@ -2,6 +2,13 @@
   "name": "test-sheet",
   "version": "0.1.0",
   "private": true,
+  "overrides": {
+    "react-scripts": {
+      "typescript": "^5.0.0",
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
+    }
+  },
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
