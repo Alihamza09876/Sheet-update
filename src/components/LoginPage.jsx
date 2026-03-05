@@ -23,16 +23,19 @@ export default function LoginPage({ onLogin }) {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-neutral-950 overflow-hidden relative">
-
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-0 right-0 w-96 h-96 bg-amber-600 opacity-5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-800 opacity-5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative flex items-center justify-center" style={{ width: 650, height: 750 }}>
-
-        <div className="absolute right-0 top-0 bottom-0 flex flex-col items-center" style={{ width: 240 }}>
-
+      <div
+        className="relative flex items-center justify-center"
+        style={{ width: 650, height: 750 }}
+      >
+        <div
+          className="absolute right-0 top-0 bottom-0 flex flex-col items-center"
+          style={{ width: 240 }}
+        >
           <div className="w-16 h-4 rounded-t-lg bg-amber-500 mt-6 shadow-lg" />
 
           <div className="w-3 h-14 bg-amber-600" />
@@ -51,7 +54,6 @@ export default function LoginPage({ onLogin }) {
           <div className="w-40 h-2.5 bg-amber-400 opacity-50 rounded-full blur-md -mt-1" />
 
           <div className="w-4 flex-1 bg-amber-800 rounded-sm relative flex items-center justify-center">
-
             <div
               onClick={() => setIsOpen(!isOpen)}
               className="absolute cursor-pointer select-none"
@@ -63,17 +65,22 @@ export default function LoginPage({ onLogin }) {
                 transform: `translateY(-50%) perspective(600px) rotateY(${isOpen ? "-70deg" : "0deg"})`,
                 transformOrigin: "right center",
                 transition: "transform 0.85s cubic-bezier(0.4,0,0.2,1)",
-                background: "linear-gradient(135deg, #1c1208 0%, #2d1f08 60%, #1c1208 100%)",
+                background:
+                  "linear-gradient(135deg, #1c1208 0%, #2d1f08 60%, #1c1208 100%)",
                 border: "2.5px solid #78450a",
                 borderRadius: "80px 80px 16px 16px",
-                boxShadow: "inset 0 0 32px rgba(0,0,0,0.7), 4px 0 20px rgba(0,0,0,0.8)",
+                boxShadow:
+                  "inset 0 0 32px rgba(0,0,0,0.7), 4px 0 20px rgba(0,0,0,0.8)",
                 zIndex: 20,
               }}
             >
               <div
                 className="absolute"
                 style={{
-                  top: 24, left: 22, right: 22, height: 110,
+                  top: 24,
+                  left: 22,
+                  right: 22,
+                  height: 110,
                   border: "1px solid #4a2d06",
                   borderRadius: "70px 70px 6px 6px",
                 }}
@@ -82,7 +89,10 @@ export default function LoginPage({ onLogin }) {
               <div
                 className="absolute"
                 style={{
-                  top: 154, left: 22, right: 22, bottom: 24,
+                  top: 154,
+                  left: 22,
+                  right: 22,
+                  bottom: 24,
                   border: "1px solid #4a2d06",
                   borderRadius: 8,
                 }}
@@ -96,8 +106,10 @@ export default function LoginPage({ onLogin }) {
                   transform: "translateY(-50%)",
                   width: 18,
                   height: 52,
-                  background: "radial-gradient(circle at 40% 30%, #f0c040, #92620c)",
-                  boxShadow: "0 2px 10px rgba(0,0,0,0.8), inset 0 1px 3px rgba(255,220,100,0.5)",
+                  background:
+                    "radial-gradient(circle at 40% 30%, #f0c040, #92620c)",
+                  boxShadow:
+                    "0 2px 10px rgba(0,0,0,0.8), inset 0 1px 3px rgba(255,220,100,0.5)",
                 }}
               />
 
@@ -215,17 +227,42 @@ export default function LoginPage({ onLogin }) {
                 <span className="relative flex items-center justify-center gap-3">
                   {isSubmitting ? (
                     <>
-                      <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      <svg
+                        className="animate-spin w-4 h-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        />
                       </svg>
                       Authenticating
                     </>
                   ) : (
                     <>
                       Grant Access
-                      <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <svg
+                        className="w-3 h-3 group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={3}
+                          d="M14 5l7 7m0 0l-7 7m7-7H3"
+                        />
                       </svg>
                     </>
                   )}
@@ -234,7 +271,6 @@ export default function LoginPage({ onLogin }) {
             </form>
           </div>
         </div>
-
       </div>
     </div>
   );
