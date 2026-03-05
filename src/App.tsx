@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
 import SidePanel from './components/SidePanel';
 import DetailsView from './components/DetailsView';
+import LoginPage from './components/LoginPage';
 
 interface Sheet {
   id: string;
@@ -14,6 +15,12 @@ interface Sheet {
  * Rebuilt with Tailwind CSS and TypeScript (TSX).
  */
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = (_email: string) => {
+    setIsLoggedIn(true);
+  };
+
   const [data, setData] = useState<any[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -22,18 +29,27 @@ const App: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
 
   // Environment Config (URLs stored in .env)
-  const baseSheetUrl = process.env.REACT_APP_SHEET_URL || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR_Gh6l5oeXXUg1iwvEJ0HzSgtdEam2YR5ZyMIPT6E7r_axX2ocW6iLvgnGGsphNR8wh9U5EZHEpBZv/pub?output=csv';
   const scriptUrl = process.env.REACT_APP_SCRIPT_URL || '';
 
-  // Multiple Sheet Support (GIDs for different tabs)
+  // Multiple Sheet Support – each sheet has its own published CSV URL from .env
   const SHEETS: Sheet[] = [
-    { id: '0', name: 'Main Inventory', gid: '0' },
-    { id: '1', name: 'Sales Log', gid: '1251648043' },
-    { id: '2', name: 'Team Roster', gid: '459201948' }
+    { id: '0', name: 'Daily Task Sheet', gid: '0' },
+    { id: '1', name: 'Stand For', gid: '1251648043' },
+    { id: '2', name: 'Laravel Sheet', gid: '459201948' },
   ];
+
+  // Per-sheet URL map
+  const sheetUrlMap: Record<string, string> = {
+    '0': process.env.REACT_APP_DAILY_TASK_SHEET_URL || process.env.REACT_APP_SHEET_URL || '',
+    '1': process.env.REACT_APP_STAND_FOR_SHEET_URL || process.env.REACT_APP_SHEET_URL || '',
+    '2': process.env.REACT_APP_LARAVEL_SHEET_URL || process.env.REACT_APP_SHEET_URL || '',
+  };
 
   const [activeSheet, setActiveSheet] = useState<Sheet>(SHEETS[0]);
   const [newRow, setNewRow] = useState<Record<string, string>>({});
+
+  // Derives the correct CSV URL for the active sheet
+  const baseSheetUrl = sheetUrlMap[activeSheet.id] || process.env.REACT_APP_SHEET_URL || '';
 
   /**
    * Constructs the URL specifically for a given Sheet (gid).
@@ -156,6 +172,10 @@ const App: React.FC = () => {
       [header]: value
     });
   };
+
+  if (!isLoggedIn) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   return (
     <div className="flex dashboard-root">

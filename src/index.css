@@ -6,13 +6,13 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-primary-100 selection:text-primary-900;
+    @apply bg-[#050505] text-slate-300 font-sans antialiased selection:bg-emerald-500/30 selection:text-white;
   }
 }
 
 @layer components {
 
-  /* Dynamic Shimmer Animation for SidePanel/DetailsView */
+  /* Dynamic Shimmer Animation */
   @keyframes shimmer {
     0% {
       transform: translateX(-150%) skewX(-20deg);
@@ -26,9 +26,23 @@
   .animate-shimmer {
     animation: shimmer 1.5s infinite;
   }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+  }
 
-  /* Shared Form Styles */
-  .input-field {
-    @apply w-full px-5 py-4 bg-slate-50 border-2 border-transparent rounded-[1.25rem] text-slate-800 font-semibold placeholder-slate-400 focus:bg-white focus:border-primary-500/20 focus:ring-4 focus:ring-primary-600/5 outline-none transition-all duration-300 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed;
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }
