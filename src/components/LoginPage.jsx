@@ -1,16 +1,13 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState } from "react";
 
-interface LoginPageProps {
-  onLogin: (email: string) => void;
-}
-export default function LoginPage({ onLogin }: LoginPageProps) {
+export default function LoginPage({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
     setIsSubmitting(true);
