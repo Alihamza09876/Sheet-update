@@ -4,20 +4,64 @@ const sheetIcons = {
   0: "📋",
   1: "🎯",
   2: "⚙️",
+  3: "📱",
+  4: "📦",
+  5: "📅",
 };
 
 const SidePanel = ({ sheets, activeSheet, onSheetChange }) => {
+  const [isOpen, setIsOpen] = React.useState(false);
+
   return (
     <>
       <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap');
                 .sp-nav-btn:hover { background: rgba(255,255,255,0.06) !important; transform: translateX(3px); }
+                
+                @media (max-width: 768px) {
+                  .sp-mobile-toggle { display: flex !important; }
+                  .sp-sidebar { 
+                    position: fixed !important; 
+                    z-index: 1000;
+                    transform: translateX(-100%);
+                    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                  }
+                  .sp-sidebar-open { transform: translateX(0) !important; }
+                  .sp-overlay { display: block !important; }
+                }
             `}</style>
 
-      <aside style={styles.sidebar}>
+      {/* Mobile Toggle Button */}
+      <button
+        className="sp-mobile-toggle"
+        onClick={() => setIsOpen(true)}
+        style={styles.mobileToggle}
+      >
+        ☰
+      </button>
+
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="sp-overlay"
+          onClick={() => setIsOpen(false)}
+          style={styles.overlay}
+        />
+      )}
+
+      <aside className={`sp-sidebar ${isOpen ? 'sp-sidebar-open' : ''}`} style={styles.sidebar}>
         <div style={styles.header}>
-          <span style={styles.logoIcon}>⬡</span>
-          <span style={styles.logoText}>SheetSync</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+            <span style={styles.logoIcon}>⬡</span>
+            <span style={styles.logoText}>SheetSync</span>
+          </div>
+          <button
+            className="sp-mobile-toggle"
+            onClick={() => setIsOpen(false)}
+            style={{ ...styles.closeBtn, display: 'none' }}
+          >
+            ✕
+          </button>
         </div>
 
         <nav style={styles.nav}>
@@ -28,7 +72,10 @@ const SidePanel = ({ sheets, activeSheet, onSheetChange }) => {
               <button
                 key={sheet.id}
                 className="sp-nav-btn"
-                onClick={() => onSheetChange(sheet)}
+                onClick={() => {
+                  onSheetChange(sheet);
+                  setIsOpen(false);
+                }}
                 style={{
                   ...styles.navItem,
                   ...(isActive ? styles.navItemActive : {}),
@@ -157,6 +204,40 @@ const styles = {
     fontSize: "11px",
     color: "rgba(255,255,255,0.2)",
   },
+  mobileToggle: {
+    position: "fixed",
+    top: "20px",
+    left: "20px",
+    width: "40px",
+    height: "40px",
+    borderRadius: "10px",
+    background: "#1c1c1e",
+    color: "#fff",
+    border: "1.5px solid rgba(255,255,255,0.1)",
+    display: "none",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "20px",
+    cursor: "pointer",
+    zIndex: 900,
+    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+  },
+  overlay: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.4)",
+    backdropFilter: "blur(4px)",
+    zIndex: 950,
+    display: "none",
+  },
+  closeBtn: {
+    background: "none",
+    border: "none",
+    color: "rgba(255,255,255,0.4)",
+    fontSize: "20px",
+    cursor: "pointer",
+    padding: "4px",
+  }
 };
 
 export default SidePanel;

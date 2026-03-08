@@ -27,10 +27,18 @@ const DetailsView = ({
                 .dv-tr:hover td { background: #faf8f5 !important; }
                 .dv-input:focus { outline: none; border-color: #6dbd8a !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(109,189,138,0.12) !important; }
                 .dv-submit:hover:not(:disabled) { background: #336040 !important; }
+                
+                @media (max-width: 768px) {
+                  .dv-main { padding: 80px 16px 24px !important; }
+                  .dv-topbar { flex-direction: column; gap: 16px; align-items: flex-start !important; }
+                  .dv-form-grid { grid-template-columns: 1fr !important; }
+                  .dv-table-container { margin: 0 -16px; border-radius: 0 !important; border-left: none; border-right: none; }
+                  .dv-th:not(:nth-child(-n+3)), .dv-td:not(:nth-child(-n+3)) { display: none; } /* Show only first 2 columns + ID on mobile */
+                }
             `}</style>
 
-      <main style={styles.main}>
-        <header style={styles.topBar}>
+      <main className="dv-main" style={styles.main}>
+        <header className="dv-topbar" style={styles.topBar}>
           <div>
             <h1 style={styles.pageTitle}>{activeSheet.name}</h1>
             <p style={styles.pageSubtitle}>
@@ -70,6 +78,7 @@ const DetailsView = ({
                   onSubmit(e);
                   setShowForm(false);
                 }}
+                className="dv-form-grid"
                 style={styles.formGrid}
               >
                 {headers.map((header) => (
@@ -100,6 +109,7 @@ const DetailsView = ({
           )}
 
           <div
+            className="dv-table-container"
             style={{ ...styles.tableCard, marginTop: showForm ? "-16px" : 0 }}
           >
             {loading ? (
@@ -119,7 +129,7 @@ const DetailsView = ({
                     <tr>
                       <th style={{ ...styles.th, ...styles.thIdx }}>#</th>
                       {headers.map((h) => (
-                        <th key={h} style={styles.th}>
+                        <th key={h} className="dv-th" style={styles.th}>
                           {h}
                         </th>
                       ))}
@@ -128,11 +138,11 @@ const DetailsView = ({
                   <tbody>
                     {data.map((row, i) => (
                       <tr key={i} className="dv-tr">
-                        <td style={{ ...styles.td, ...styles.tdIdx }}>
+                        <td className="dv-td" style={{ ...styles.td, ...styles.tdIdx }}>
                           {i + 1}
                         </td>
                         {headers.map((h) => (
-                          <td key={h} style={styles.td}>
+                          <td key={h} className="dv-td" style={styles.td}>
                             {row[h] ?? "—"}
                           </td>
                         ))}
@@ -359,7 +369,11 @@ const styles = {
     animation: "spin 0.8s linear infinite",
   },
   stateText: { color: "#aaa", fontSize: "13px", margin: 0 },
-  emptyIcon: { fontSize: "36px" },
+  loader: {
+    display: "flex",
+    justifyContent: "center",
+    padding: "40px",
+  }
 };
 
 export default DetailsView;
