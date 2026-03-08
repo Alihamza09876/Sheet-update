@@ -138,7 +138,10 @@ const DetailsView = ({
                   <tbody>
                     {data.map((row, i) => (
                       <tr key={i} className="dv-tr">
-                        <td className="dv-td" style={{ ...styles.td, ...styles.tdIdx }}>
+                        <td
+                          className="dv-td"
+                          style={{ ...styles.td, ...styles.tdIdx }}
+                        >
                           {i + 1}
                         </td>
                         {headers.map((h) => (
@@ -373,7 +376,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     padding: "40px",
-  }
+  },
 };
 
 export default DetailsView;

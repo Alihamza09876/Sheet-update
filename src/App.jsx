@@ -22,7 +22,13 @@ const SHEETS = [
     password: "task",
   },
   { id: "1", slug: "stand-for", name: "Stand For", gid: "", password: "stand" },
-  { id: "2", slug: "laravel", name: "Laravel Sheet", gid: "", password: "lara" },
+  {
+    id: "2",
+    slug: "laravel",
+    name: "Laravel Sheet",
+    gid: "",
+    password: "lara",
+  },
   {
     id: "3",
     slug: "social-media",
@@ -33,11 +39,17 @@ const SHEETS = [
   {
     id: "4",
     slug: "inventory",
-    name: "Inventory Tracker",
+    name: "Tools Coding + Information",
     gid: "",
     password: "inv",
   },
-  { id: "5", slug: "timeline", name: "Project Timeline", gid: "", password: "proj" },
+  {
+    id: "5",
+    slug: "timeline",
+    name: "Project Timeline",
+    gid: "",
+    password: "proj",
+  },
 ];
 
 const AUTH_TOKEN_KEY = "auth_token";
