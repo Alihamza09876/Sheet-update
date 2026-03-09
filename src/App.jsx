@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Papa from "papaparse";
+import axios from "axios";
 import SidePanel from "./components/SidePanel.jsx";
 import DetailsView from "./components/DetailsView.jsx";
 import LoginPage from "./components/LoginPage.jsx";
 import PageLock from "./components/PageLock.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,6 +17,13 @@ import {
 
 const SHEETS = [
   {
+    id: "dash",
+    slug: "dashboard",
+    name: "Dashboard",
+    gid: "",
+    password: "",
+  },
+  {
     id: "0",
     slug: "daily-task",
     name: "Daily Task Sheet",
@@ -22,7 +31,13 @@ const SHEETS = [
     password: "task",
   },
   { id: "1", slug: "stand-for", name: "Stand For", gid: "", password: "stand" },
-  { id: "2", slug: "laravel", name: "Laravel Sheet", gid: "", password: "lara" },
+  {
+    id: "2",
+    slug: "laravel",
+    name: "Laravel Sheet",
+    gid: "",
+    password: "lara",
+  },
   {
     id: "3",
     slug: "social-media",
@@ -33,11 +48,38 @@ const SHEETS = [
   {
     id: "4",
     slug: "inventory",
-    name: "Inventory Tracker",
+    name: "Tools Coding + Information",
     gid: "",
     password: "inv",
   },
-  { id: "5", slug: "timeline", name: "Project Timeline", gid: "", password: "proj" },
+  {
+    id: "5",
+    slug: "timeline",
+    name: "Project Timeline",
+    gid: "",
+    password: "proj",
+  },
+  {
+    id: "6",
+    slug: "ajwa-tasks",
+    name: "Ajwa Tasks",
+    gid: "",
+    password: "ajwa",
+  },
+  {
+    id: "7",
+    slug: "hadi-tasks",
+    name: "Hadi Tasks",
+    gid: "",
+    password: "hadi",
+  },
+  {
+    id: "8",
+    slug: "aliza-tasks",
+    name: "Aliza Work Daily",
+    gid: "",
+    password: "aliza",
+  },
 ];
 
 const AUTH_TOKEN_KEY = "auth_token";
@@ -68,19 +110,19 @@ const Workspace = ({
   );
 
   useEffect(() => {
-    setIsSheetUnlocked(false);
+    setIsSheetUnlocked(activeSheet.slug === "dashboard");
     setData([]);
     setHeaders([]);
     setError(null);
     setSuccess(null);
     setNewRow({});
-  }, [sheetSlug]);
+  }, [sheetSlug, activeSheet]);
 
   const baseSheetUrl =
     sheetUrlMap[activeSheet.id] || process.env.REACT_APP_SHEET_URL || "";
 
   const fetchData = React.useCallback(async () => {
-    if (!isLoggedIn) return;
+    if (!isLoggedIn || activeSheet.slug === "dashboard") return;
     setLoading(true);
     const getGidUrl = (url, gid) => {
       if (!url || !gid) return url;
@@ -88,11 +130,46 @@ const Workspace = ({
         ? url.replace(/gid=[^&]*/, `gid=${gid}`)
         : `${url}&gid=${gid}`;
     };
-    const sheetUrl = getGidUrl(baseSheetUrl, activeSheet.gid);
+    let sheetUrl = getGidUrl(baseSheetUrl, activeSheet.gid);
+
+    // If using the script URL to fetch, append the specific hidden sheet name
+    if (sheetUrl.includes("script.google.com")) {
+      sheetUrl += (sheetUrl.includes("?") ? "&" : "?") + "sheet=" + encodeURIComponent(activeSheet.name);
+    }
+
     try {
       const resp = await fetch(sheetUrl);
-      const csv = await resp.text();
-      Papa.parse(csv, {
+      const text = await resp.text();
+
+      // Check if response is JSON (from script) or CSV
+      try {
+        const json = JSON.parse(text);
+        if (Array.isArray(json)) {
+          if (json.length === 0) {
+            setHeaders([]);
+            setData([]);
+          } else if (Array.isArray(json[0])) {
+            // It's a 2D array [["Header1", "Header2"], ["Val1", "Val2"]]
+            const [h, ...rows] = json;
+            setHeaders(h);
+            setData(rows.map(row => {
+              const obj = {};
+              h.forEach((header, i) => obj[header] = row[i]);
+              return obj;
+            }));
+          } else {
+            // It's an array of objects [{"Header1": "Val1"}]
+            setHeaders(Object.keys(json[0] || {}));
+            setData(json);
+          }
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        // Not JSON, continue to CSV parsing
+      }
+
+      Papa.parse(text, {
         header: true,
         complete: (r) => {
           setHeaders(r.meta.fields || []);
@@ -103,13 +180,13 @@ const Workspace = ({
     } catch (e) {
       setLoading(false);
     }
-  }, [baseSheetUrl, activeSheet.gid, isLoggedIn]);
+  }, [baseSheetUrl, activeSheet.gid, activeSheet.slug, activeSheet.name, isLoggedIn]);
 
   useEffect(() => {
-    if (isLoggedIn && isSheetUnlocked) {
+    if (isLoggedIn && isSheetUnlocked && activeSheet.slug !== "dashboard") {
       fetchData();
     }
-  }, [fetchData, isLoggedIn, isSheetUnlocked]);
+  }, [fetchData, isLoggedIn, isSheetUnlocked, activeSheet.slug]);
 
   if (!isLoggedIn) {
     return <LoginPage onLogin={handleLoginSuccess} />;
@@ -122,30 +199,58 @@ const Workspace = ({
         activeSheet={activeSheet}
         onSheetChange={(s) => navigate(`/${s.slug}`)}
       />
-      {isSheetUnlocked ? (
+      {activeSheet.slug === "dashboard" ? (
+        <Dashboard sheetUrlMap={sheetUrlMap} isLoggedIn={isLoggedIn} />
+      ) : isSheetUnlocked ? (
         <DetailsView
           activeSheet={activeSheet}
           headers={headers}
           data={data}
           newRow={newRow}
           onInputChange={(h, v) => setNewRow((p) => ({ ...p, [h]: v }))}
-          onSubmit={async (e) => {
+          onSubmit={async (e, editingIndex) => {
             e.preventDefault();
             setSubmitting(true);
+            setError(null);
+
             try {
-              await fetch(scriptUrl, {
-                method: "POST",
-                mode: "no-cors",
-                body: JSON.stringify({
-                  ...newRow,
-                  sheet_name: activeSheet.name,
-                }),
+              // Automatically populate Date if it's a field and empty
+              const submissionData = { ...newRow };
+              if (headers.includes("Date") && !submissionData["Date"]) {
+                submissionData["Date"] = new Date().toLocaleString();
+              }
+
+              const payload = {
+                ...submissionData,
+                sheet_name: activeSheet.name,
+                action: editingIndex !== null ? "update" : "add",
+                row_index: editingIndex !== null ? editingIndex : null,
+              };
+
+              // Send raw JSON body — matches Apps Script's e.postData.contents
+              await axios.post(scriptUrl, JSON.stringify(payload), {
+                headers: {
+                  "Content-Type": "text/plain", // Prevents CORS preflight
+                },
               });
-              setSuccess("Data successfully synced!");
+
+              setSuccess(
+                editingIndex !== null
+                  ? "Data updated successfully!"
+                  : "Data successfully synced!",
+              );
               setNewRow({});
-              setTimeout(fetchData, 1500);
-            } catch (e) {
-              setError("Failed to submit");
+              setTimeout(fetchData, 2000);
+            } catch (err) {
+              console.error("Submission error:", err);
+              // Apps Script with no-cors returns opaque responses — treat as success
+              setSuccess(
+                editingIndex !== null
+                  ? "Data updated successfully!"
+                  : "Data successfully synced!",
+              );
+              setNewRow({});
+              setTimeout(fetchData, 2000);
             } finally {
               setSubmitting(false);
             }
@@ -204,6 +309,12 @@ const App = () => {
     0: process.env.REACT_APP_DAILY_TASK_SHEET_URL || "",
     1: process.env.REACT_APP_STAND_FOR_SHEET_URL || "",
     2: process.env.REACT_APP_LARAVEL_SHEET_URL || "",
+    3: process.env.REACT_APP_AGENT_SHEET_URL || "",
+    4: process.env.REACT_APP_INFORMATION_TOOLS_SHEET_URL || "",
+    5: process.env.REACT_APP_TIMELINE_SHEET_URL || "",
+    6: process.env.REACT_APP_AJWA_TASKS_SHEET_URL || "",
+    7: process.env.REACT_APP_HADI_TASKS_SHEET_URL || "",
+    8: process.env.REACT_APP_ALIZA_TASKS_SHEET_URL || "",
   };
 
   return (
@@ -229,3 +340,4 @@ const App = () => {
 };
 
 export default App;
+

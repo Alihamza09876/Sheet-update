@@ -1,12 +1,16 @@
 import React from "react";
 
 const sheetIcons = {
+  dash: "📊",
   0: "📋",
   1: "🎯",
   2: "⚙️",
   3: "📱",
   4: "📦",
   5: "📅",
+  6: "🌸",
+  7: "👨‍💻",
+  8: "👩‍🏫",
 };
 
 const SidePanel = ({ sheets, activeSheet, onSheetChange }) => {
@@ -49,16 +53,26 @@ const SidePanel = ({ sheets, activeSheet, onSheetChange }) => {
         />
       )}
 
-      <aside className={`sp-sidebar ${isOpen ? 'sp-sidebar-open' : ''}`} style={styles.sidebar}>
+      <aside
+        className={`sp-sidebar ${isOpen ? "sp-sidebar-open" : ""}`}
+        style={styles.sidebar}
+      >
         <div style={styles.header}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flex: 1,
+            }}
+          >
             <span style={styles.logoIcon}>⬡</span>
             <span style={styles.logoText}>SheetSync</span>
           </div>
           <button
             className="sp-mobile-toggle"
             onClick={() => setIsOpen(false)}
-            style={{ ...styles.closeBtn, display: 'none' }}
+            style={{ ...styles.closeBtn, display: "none" }}
           >
             ✕
           </button>
@@ -237,7 +251,7 @@ const styles = {
     fontSize: "20px",
     cursor: "pointer",
     padding: "4px",
-  }
+  },
 };
 
 export default SidePanel;

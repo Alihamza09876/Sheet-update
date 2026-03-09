@@ -14,6 +14,20 @@ const DetailsView = ({
   success,
 }) => {
   const [showForm, setShowForm] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(null);
+
+  const handleEdit = (row, index) => {
+    // Populate form with row data
+    headers.forEach((h) => onInputChange(h, row[h] || ""));
+    setEditingIndex(index);
+    setShowForm(true);
+  };
+
+  const handleClearForm = () => {
+    headers.forEach((h) => onInputChange(h, ""));
+    setEditingIndex(null);
+    setShowForm(false);
+  };
 
   return (
     <>
@@ -27,6 +41,7 @@ const DetailsView = ({
                 .dv-tr:hover td { background: #faf8f5 !important; }
                 .dv-input:focus { outline: none; border-color: #6dbd8a !important; background: #fff !important; box-shadow: 0 0 0 3px rgba(109,189,138,0.12) !important; }
                 .dv-submit:hover:not(:disabled) { background: #336040 !important; }
+                .dv-edit-btn:hover { background: #f0f7f3 !important; color: #2d6a4f !important; border-color: #2d6a4f !important; }
                 
                 @media (max-width: 768px) {
                   .dv-main { padding: 80px 16px 24px !important; }
@@ -59,7 +74,10 @@ const DetailsView = ({
                 ...styles.btnAdd,
                 ...(showForm ? styles.btnCancel : {}),
               }}
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                if (showForm) handleClearForm();
+                else setShowForm(true);
+              }}
             >
               {showForm ? "✕ Cancel" : "+ Add Row"}
             </button>
@@ -72,11 +90,13 @@ const DetailsView = ({
         <div style={styles.contentStack}>
           {showForm && (
             <div style={styles.formPanel}>
-              <h2 style={styles.formTitle}>Add New Row</h2>
+              <h2 style={styles.formTitle}>
+                {editingIndex !== null ? "Edit Row" : "Add New Row"}
+              </h2>
               <form
                 onSubmit={(e) => {
-                  onSubmit(e);
-                  setShowForm(false);
+                  onSubmit(e, editingIndex);
+                  handleClearForm();
                 }}
                 className="dv-form-grid"
                 style={styles.formGrid}
@@ -101,7 +121,11 @@ const DetailsView = ({
                     style={styles.btnSubmit}
                     disabled={submitting}
                   >
-                    {submitting ? "Saving…" : "Save Row"}
+                    {submitting
+                      ? "Saving…"
+                      : editingIndex !== null
+                        ? "Update Row"
+                        : "Save Row"}
                   </button>
                 </div>
               </form>
@@ -133,12 +157,16 @@ const DetailsView = ({
                           {h}
                         </th>
                       ))}
+                      <th className="dv-th" style={{ ...styles.th, textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.map((row, i) => (
                       <tr key={i} className="dv-tr">
-                        <td className="dv-td" style={{ ...styles.td, ...styles.tdIdx }}>
+                        <td
+                          className="dv-td"
+                          style={{ ...styles.td, ...styles.tdIdx }}
+                        >
                           {i + 1}
                         </td>
                         {headers.map((h) => (
@@ -146,6 +174,15 @@ const DetailsView = ({
                             {row[h] ?? "—"}
                           </td>
                         ))}
+                        <td className="dv-td" style={{ ...styles.td, textAlign: 'center' }}>
+                          <button
+                            className="dv-edit-btn"
+                            onClick={() => handleEdit(row, i)}
+                            style={styles.editBtn}
+                          >
+                            Edit
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -373,6 +410,17 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     padding: "40px",
+  },
+  editBtn: {
+    padding: "4px 12px",
+    borderRadius: "6px",
+    border: "1px solid #ddd",
+    background: "#fff",
+    color: "#666",
+    fontSize: "12px",
+    fontWeight: 500,
+    cursor: "pointer",
+    transition: "all 0.2s",
   }
 };
 
